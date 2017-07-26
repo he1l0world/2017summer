@@ -14,20 +14,29 @@
 #include<fcntl.h>
 #include<sys/stat.h>
 #include<dirent.h>
+#include<signal.h>
+#include<readline/readline.h>
+#include<readline/history.h>
 #define normal 0 //一般的命令
 #define out_redirect 1 //输出重定向
 #define in_redirect 2  //输入重定向
 #define have_pipe 3 //命令中有管道
+#define outt_redirect 4 //输出重定向>>
 
 void print_prompt(); //打印提示符
 void get_input(char *);  //得到输入的命令
 void explain_input(char *,int *,char a[][256]);  //对输入命令解析
 void do_cmd(int ,char a[][256]);  //执行命令
 int find_command(char *);  //查找命令中的可执行程序
+void handle_sight();
+char *pre;
+void handle_sight(int signo){
+}
 
 int main ()
 {
     int i;
+    signal(SIGINT, handle_sight);
     int argcount=0;
     char arglist[100][256];
     char **arg=NULL;
@@ -46,9 +55,12 @@ int main ()
         memset(buf,0,256);
         print_prompt();
         get_input(buf);
+        signal(SIGINT, handle_sight);
         //如果输入命令为exit或者logout推出程序
         if(strcmp(buf,"exit\n") ==0 ||strcmp(buf,"logout\n") == 0)
             break;
+        if(strncmp(buf,"\n",2) == 0)
+            continue;
         for(i=0;i<100;i++)
             arglist[i][0]='\0';
         argcount=0;
@@ -65,29 +77,63 @@ int main ()
 
 void print_prompt()
 {
-    printf("myshell$$:");
+    char buf[80];
+    char a[40];
+    int count=0;
+    getcwd(buf,sizeof(buf));
+    for(int i=0;i<strlen(buf);i++)
+    {
+        if(buf[i]=='/')
+            count++;
+    }
+    if(count<=3)
+        strcpy(a,"~");
+    int j=0;
+    if(count>=3)
+    {
+        for(int i=0;i<strlen(buf);i++)
+        {
+            a[j++]=buf[i];
+            if(buf[i]=='/')
+                j=0;
+        }
+        a[j]='\0';
+    }
+    printf("[chen@ %s]$ ",a);
 }
 /*获取用户输入*/
 void get_input(char *buf)
 {
-    int len=0;
+    char *a;
+    /*int len=0;
     char ch;
 
-    ch=getchar();
-    while(len<256 && ch !='\n')
-    {
-        //printf("%c",ch);
-        buf[len++]=ch;
         ch=getchar();
-    }
-    if(len == 256)
-    {
-        printf("command is too long \n");
-        exit(-1);//命令过长
-    }
-    buf[len]='\n';
-    buf[++len]='\0';
-    //printf("%s",buf);
+        while(len<256 && ch !='\n')
+        {
+            //printf("%c",ch);
+            buf[len++]=ch;
+            ch=getchar();
+        }
+        if(len == 256)
+        {
+            printf("command is too long \n");
+            exit(-1);//命令过长
+        }
+        buf[len]='\n';
+        buf[++len]='\0';*/
+        a=readline("");
+        int len=strlen(a);
+        if(len >= 256)
+        {
+            printf("command is too long\n");
+            exit(-1);
+        }
+        a[len]='\n';
+        a[++len]='\0';
+        strncpy(buf,a,len);
+        if(buf)
+            add_history(buf);
 }
 
 /*解析buf的命令，将结果存入arglis，命令以回车结束*/
@@ -114,7 +160,6 @@ void explain_input(char *buf,int *argcount,char arglist[100][256])
                 number++;
                 q++;
             }
-
             strncpy(arglist[*argcount],p,number+1);
             arglist[*argcount][number]='\0';
             (*argcount)++;
@@ -139,7 +184,7 @@ void do_cmd(int argcount,char arglist[100][256])
 
     //将命令取出
     for(i=0;i<argcount;i++)
-        arg[i]=(char *)arglist[i];
+        arg[i]=arglist[i];
     arg[argcount]=NULL;
 
     /*查看命令行是否有后台运行符*/
@@ -186,6 +231,13 @@ void do_cmd(int argcount,char arglist[100][256])
             if(i==0)
                 flag++;
         }
+        if(strcmp(arg[i],">>") == 0)
+        {
+            flag++;
+            how=outt_redirect;
+            if(arg[i+1] == NULL)
+                flag++;
+        }
     }
 
     /*flag大于1，说明命令中含有多个>,<,|符号，所以是错误命令*/
@@ -200,6 +252,17 @@ void do_cmd(int argcount,char arglist[100][256])
         for(i=0;arg[i] != NULL;i++)
         {
             if(strcmp(arg[i],">") == 0)
+            {
+                file =arg[i+1];
+                arg[i]=NULL;
+            }
+        }
+    }
+    if(how == outt_redirect)
+    {
+        for(i=0;arg[i]!=NULL;i++)
+        {
+            if(strcmp(arg[i],">>") == 0)
             {
                 file =arg[i+1];
                 arg[i]=NULL;
@@ -247,13 +310,29 @@ void do_cmd(int argcount,char arglist[100][256])
         /*pid为零说明是子进程，在子进程中执行输入的命令*/
             if(pid == 0)
             {
-                if(!(find_command(arg[0])))
+                if(strcmp(arg[0],"cd") != 0&&!(find_command(arg[0])))
                 {
                     printf("%s : command not found\n",arg[0]);
                     exit(0);
                 }
-                execvp(arg[0],arg);
+                if(strcmp(arg[0],"cd") !=0)
+                    execvp(arg[0],arg);
                 exit(0);
+            }
+            else
+            {
+                if(strcmp(arg[0],"cd") == 0)
+                {
+                    if(arg[1]==NULL)
+                    {
+                        arg[1]="./";
+                        pre=arg[1];
+                    }
+                    if(chdir(arg[1]) < 0)
+                    {
+                        printf("cd error\n");
+                    }
+                }
             }
             break;
         case 1://输入命令含有重定向>
@@ -264,7 +343,7 @@ void do_cmd(int argcount,char arglist[100][256])
                     printf("%s : command not found\n",arg[0]);
                     exit(0);
                 }
-                fd=open(file,O_RDWR|O_CREAT|O_TRUNC,0644);
+                fd=open(file,O_RDWR|O_CREAT|O_TRUNC,0664);
                 dup2(fd,1);
                 execvp(arg[0],arg);
                 exit(0);
@@ -303,7 +382,7 @@ void do_cmd(int argcount,char arglist[100][256])
                         exit(0);
                     }
                     fd2 = open("/temp/youdonotknowfile",O_WRONLY|O_CREAT|O_TRUNC,0644);
-                    dup2(fd,1);
+                    dup2(fd2,1);
                     execvp(arg[0],arg);
                     exit(0);
                 }
@@ -324,6 +403,23 @@ void do_cmd(int argcount,char arglist[100][256])
                 exit(0);
             }
             break;
+        case 4:
+                if(pid == 0)
+                {
+                    if(!find_command(arg[0]))
+                    {
+                        printf("%s : comman not found\n",arg[0]);
+                        exit(0);
+                    }
+                    fd=open(file,O_CREAT|O_APPEND|O_RDWR,0664);
+                    //printf("%s\n",file);
+                    if(fd== -1)
+                        printf("无法打开\n");
+                    dup2(fd,1);
+                    execvp(arg[0],arg);
+                    exit(0);
+                }
+                break;
         default:
             break;
     }
