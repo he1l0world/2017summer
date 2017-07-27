@@ -17,6 +17,8 @@
 #include<signal.h>
 #include<readline/readline.h>
 #include<readline/history.h>
+#include<pwd.h>
+#include<sys/utsname.h>
 #define normal 0 //一般的命令
 #define out_redirect 1 //输出重定向
 #define in_redirect 2  //输入重定向
@@ -78,28 +80,32 @@ int main ()
 void print_prompt()
 {
     char buf[80];
-    char a[40];
+    char a[20][40];
     int count=0;
+    struct passwd *pw;
+    struct utsname uts;
+
+    pw=getpwuid(getuid());
     getcwd(buf,sizeof(buf));
+    int j=0;
     for(int i=0;i<strlen(buf);i++)
     {
+        if(buf[i]!='/')
+            a[count][j++]=buf[i];
         if(buf[i]=='/')
-            count++;
-    }
-    if(count<=3)
-        strcpy(a,"~");
-    int j=0;
-    if(count>=3)
-    {
-        for(int i=0;i<strlen(buf);i++)
         {
-            a[j++]=buf[i];
-            if(buf[i]=='/')
-                j=0;
+            a[count][j]='\0';
+            count++;
+            j=0;
         }
-        a[j]='\0';
     }
-    printf("[chen@ %s]$ ",a);
+    a[count][j]='\0';
+    if(uname(&uts) < 0)
+        printf("无法获取主机名");
+    if(count==2)
+        printf("[""\033[31;47m%s\033[0m""@%s ""\033[32;47m~\033[0m""]",pw->pw_name,uts.nodename);
+    else
+        printf("[""\033[31;47m%s\033[0m""@%s ""\033[32;47m%s\033[0m""]",pw->pw_name,uts.nodename,a[count]);
 }
 /*获取用户输入*/
 void get_input(char *buf)
@@ -122,7 +128,7 @@ void get_input(char *buf)
         }
         buf[len]='\n';
         buf[++len]='\0';*/
-        a=readline("");
+        a=readline("$ ");
         int len=strlen(a);
         if(len >= 256)
         {
@@ -357,7 +363,7 @@ void do_cmd(int argcount,char arglist[100][256])
                     printf("%s :command not found!\n",arg[0]);
                     exit(0);
                 }
-                fd=open(file,O_RDONLY);
+                fd=open(file,O_WRONLY);
                 dup2(fd,0);
                 execvp(arg[0],arg);
                 exit(0);
