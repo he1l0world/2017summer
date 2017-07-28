@@ -24,6 +24,7 @@
 #define in_redirect 2  //输入重定向
 #define have_pipe 3 //命令中有管道
 #define outt_redirect 4 //输出重定向>>
+#define run_history 6
 
 void print_prompt(); //打印提示符
 void get_input(char *);  //得到输入的命令
@@ -31,7 +32,11 @@ void explain_input(char *,int *,char a[][256]);  //对输入命令解析
 void do_cmd(int ,char a[][256]);  //执行命令
 int find_command(char *);  //查找命令中的可执行程序
 void handle_sight();
-char *pre;
+int add_his(char *);
+int read_line(int fd);
+
+int num=1;
+char pre[256];
 void handle_sight(int signo){
 }
 
@@ -50,7 +55,7 @@ int main ()
         perror("malloc failed");
         exit(1);
     }
-
+ 
     while(1)
     {
         //将buf空间清空
@@ -63,10 +68,17 @@ int main ()
             break;
         if(strncmp(buf,"\n",2) == 0)
             continue;
+        if(strcmp(buf,"cd -\n") == 0)
+        {
+            chdir(pre);
+            continue;
+        }
         for(i=0;i<100;i++)
             arglist[i][0]='\0';
         argcount=0;
         explain_input(buf,&argcount,arglist);
+        memset(pre,'\0',sizeof(pre));
+        getcwd(pre,sizeof(pre));
         do_cmd(argcount,arglist);
     }
     if(buf!=NULL)
@@ -107,6 +119,20 @@ void print_prompt()
     else
         printf("[""\033[31;47m%s\033[0m""@%s ""\033[32;47m%s\033[0m""]",pw->pw_name,uts.nodename,a[count]);
 }
+int add_his(char *buf)
+{
+    int fd;
+    char a[256];
+    char *file="/home/chen/programing/github/2017_summer/Linux_Command/.history.txt";
+    fd = open(file,O_RDWR|O_APPEND);
+    if (fd < 0) {
+        printf("打开历史文件失败\n");
+        return 0;
+    }
+    if(write(fd,buf,sizeof(buf)) < 0)
+        printf("添加历史记录失败");
+    close(fd);
+}
 /*获取用户输入*/
 void get_input(char *buf)
 {
@@ -140,6 +166,8 @@ void get_input(char *buf)
         strncpy(buf,a,len);
         if(buf)
             add_history(buf);
+        if(strcmp(buf,"\n") !=0)
+            add_his(buf);
 }
 
 /*解析buf的命令，将结果存入arglis，命令以回车结束*/
@@ -173,7 +201,23 @@ void explain_input(char *buf,int *argcount,char arglist[100][256])
         }
     }
 }
-
+int read_line(int fd)
+{
+    char ch[1];
+    int i;
+    if(read(fd,ch,1)==0)
+        return 0;
+    printf(" %d ",num);
+    lseek(fd,-1,SEEK_CUR);
+    while(i=read(fd,ch,1)!=0)
+    {
+        printf("%c",ch[0]);
+        if(ch[0]=='\n')
+            break;
+    }
+    num++;
+    return 1;
+}
 
 void do_cmd(int argcount,char arglist[100][256])
 {
@@ -316,13 +360,15 @@ void do_cmd(int argcount,char arglist[100][256])
         /*pid为零说明是子进程，在子进程中执行输入的命令*/
             if(pid == 0)
             {
-                if(strcmp(arg[0],"cd") != 0&&!(find_command(arg[0])))
+                if(strcmp(arg[0],"history")!=0&& strcmp(arg[0],"cd") != 0&&!(find_command(arg[0])))
                 {
-                    printf("%s : command not found\n",arg[0]);
+                printf("%s : command not found\n",arg[0]);
                     exit(0);
                 }
-                if(strcmp(arg[0],"cd") !=0)
+                if(strcmp(arg[0],"cd") !=0&&strcmp(arg[0],"history")!=0)
+                {
                     execvp(arg[0],arg);
+                }
                 exit(0);
             }
             else
@@ -332,11 +378,30 @@ void do_cmd(int argcount,char arglist[100][256])
                     if(arg[1]==NULL)
                     {
                         arg[1]="./";
-                        pre=arg[1];
                     }
                     if(chdir(arg[1]) < 0)
                     {
                         printf("cd error\n");
+                    }
+                }
+                if(strcmp(arg[0],"history") == 0)
+                {
+                    int fd;
+                    char *file="/home/chen/programing/github/2017_summer/Linux_Command/.history.txt";
+                    if(arg[1]== NULL)
+                    {
+                        if((fd=open(file,O_RDONLY)) < 0)
+                        {
+                            printf("打开历史文件失败\n");
+                        }
+                        while(read_line(fd)!=0);
+                        close(fd);
+                    }
+                   else 
+                    {
+                        if((fd=open(file,O_TRUNC)) < 0)
+                            printf("清空历史失败\n");
+                        close(fd);
                     }
                 }
             }
