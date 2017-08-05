@@ -9,6 +9,8 @@
 #include<stdlib.h>
 #include<sys/types.h>
 #include<unistd.h>
+#include<string.h>
+#include<wait.h>
 
 /*子进程读写管道的函数*/
 void child_rw_pipe(int readfd,int writefd)
@@ -57,9 +59,17 @@ int main ()
             printf("fork error!\n");
             exit(1);
         case 0:
-            /*子进程关闭pipe1的读端，关闭pipe2的写段*/
-            close(pipe1[0]);
+            /*子进程关闭pipe1的写端，关闭pipe2的读段*/
+            close(pipe1[1]);
+            close(pipe2[0]);
+            child_rw_pipe(pipe1[0] , pipe2[1]);
+            exit(0);
+        default:
+            /*父进程关闭pipe2的写段，关闭pipe1的读段*/
             close(pipe2[1]);
-            
+            close(pipe1[0]);
+            parent_rw_pipe(pipe2[0] , pipe1[1]);
+            wait(&sta_val);
+            exit(0);
     }
 }
