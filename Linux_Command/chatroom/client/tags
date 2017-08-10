@@ -1,0 +1,36 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BUFSIZE	client_base.h	9;"	d
+CHAT_COM	client_base.h	14;"	d
+CHAT_PRI	client_base.h	15;"	d
+DOWNLOAD_FILE	client_base.h	13;"	d
+INVALID_USERINFO	client_base.c	18;"	d	file:
+SIGN_IN	client_base.h	10;"	d
+SIGN_UP	client_base.h	11;"	d
+UPDATE_FILE	client_base.h	12;"	d
+USER	client_base.h	/^    }USER;$/;"	t	typeref:struct:user
+VALID_USERINFO	client_base.c	19;"	d	file:
+_CLIENT_BASE_H	client_base.h	8;"	d
+buf	client_base.h	/^        char buf[BUFSIZE];$/;"	m	struct:node
+cc	Makefile	/^cc=gcc$/;"	m
+input_userinfo	client_base.c	/^int input_userinfo(int conn_fd , const char *string)$/;"	f
+main	my_client.c	/^int main ()$/;"	f
+main_UI	my_client.c	/^void main_UI ()$/;"	f
+my_err	client_base.c	/^void my_err(const char *err_string ,int line)$/;"	f
+my_recv	client_base.c	/^int my_recv(int conn_fd , struct node Buf ,int len)$/;"	f
+node	client_base.h	/^    struct node$/;"	s
+password	client_base.h	/^        char password[32];$/;"	m	struct:user
+path	client_base.h	/^        char path[BUFSIZE];$/;"	m	struct:node
+recv	client_base.h	/^        char recv[BUFSIZE];$/;"	m	struct:node
+send	client_base.h	/^        char send[BUFSIZE];$/;"	m	struct:node
+send_data	client_base.c	/^void send_data(int conn_fd , struct node *buf , int len)$/;"	f
+sign_in	client_base.c	/^void sign_in(int conn_fd ,struct user *userinfo , struct sockaddr_in serv_addr)$/;"	f
+sign_up	client_base.c	/^void sign_up(int conn_fd , struct user *userinfo , struct sockaddr_in serv_addr)$/;"	f
+type	client_base.h	/^        int type;$/;"	m	struct:node
+user	client_base.h	/^    typedef struct user$/;"	s
+username	client_base.h	/^        char username[32];$/;"	m	struct:user
+users	client_base.h	/^        struct user  users;$/;"	m	struct:node	typeref:struct:node::user

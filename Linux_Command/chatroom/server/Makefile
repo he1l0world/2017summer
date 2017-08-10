@@ -1,6 +1,6 @@
 cc=gcc
-my_server:server_base.h 
-	$(cc) - o  my_server server_base.c
+all:
+	$(cc) -o  my_server my_server.c -lpthread
 
 clean:
 	-rm -r *.o
