@@ -1,0 +1,51 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BUFSIZE	my_server.c	27;"	d	file:
+CHAT_ADD	my_server.c	32;"	d	file:
+CHAT_CREATE	my_server.c	34;"	d	file:
+CHAT_DEL	my_server.c	36;"	d	file:
+CHAT_JOIN	my_server.c	35;"	d	file:
+CHAT_PRI	my_server.c	33;"	d	file:
+DOWNLOAD_FILE	my_server.c	31;"	d	file:
+INVALID_USERINFO	my_server.c	25;"	d	file:
+LISTENQ	my_server.c	24;"	d	file:
+SIGN_IN	my_server.c	28;"	d	file:
+SIGN_UP	my_server.c	29;"	d	file:
+UPDATE_FILE	my_server.c	30;"	d	file:
+VALID_USERINFO	my_server.c	26;"	d	file:
+add_his	my_server.c	/^void add_his(char *err_string ,int line)$/;"	f
+buf	my_server.c	/^    char buf[BUFSIZE];$/;"	m	struct:node	file:
+cc	Makefile	/^cc=gcc$/;"	m
+chat_add	my_server.c	/^void chat_add(int con_fd , struct node Buf)$/;"	f
+check_account	my_server.c	/^int check_account(struct node Buf)$/;"	f
+con_fd	my_server.c	/^struct con_fd$/;"	s	file:
+do_something	my_server.c	/^void *do_something(void* arg)$/;"	f
+download_file	my_server.c	/^void download_file(int con_fd , struct node Buf)$/;"	f
+err_his	my_server.c	/^char *err_his = ".err_history.txt";$/;"	v
+filename	my_server.c	/^    char filename[BUFSIZE];$/;"	m	struct:node	file:
+i	my_server.c	/^int i = 0;$/;"	v
+id	my_server.c	/^    int id;$/;"	m	struct:node	file:
+main	my_server.c	/^int main ()$/;"	f
+my_err	my_server.c	/^void my_err(char *err_string ,int line)$/;"	f
+mysql	my_server.c	/^MYSQL mysql;$/;"	v
+name	my_server.c	/^    char name[32];$/;"	m	struct:con_fd	file:
+name	my_server.c	/^    char name[BUFSIZE];$/;"	m	struct:node	file:
+node	my_server.c	/^struct node$/;"	s	file:
+num	my_server.c	/^int num = 0;$/;"	v
+ope_his	my_server.c	/^char *ope_his = ".ope_history.txt";$/;"	v
+password	my_server.c	/^    char password[32];$/;"	m	struct:user	file:
+result	my_server.c	/^MYSQL_RES *result;$/;"	v
+row	my_server.c	/^MYSQL_ROW row;$/;"	v
+send	my_server.c	/^    char send[BUFSIZE];$/;"	m	struct:node	file:
+sign_handle	my_server.c	/^void sign_handle(int signo)$/;"	f
+stat	my_server.c	/^    int stat;$/;"	m	struct:con_fd	file:
+type	my_server.c	/^    int type;$/;"	m	struct:node	file:
+update_file	my_server.c	/^void update_file(int con_fd ,struct node Buf)$/;"	f
+user	my_server.c	/^struct user$/;"	s	file:
+userinfo	my_server.c	/^struct con_fd userinfo[1000];$/;"	v	typeref:struct:con_fd
+username	my_server.c	/^    char username[32];$/;"	m	struct:user	file:
+users	my_server.c	/^    struct user users;$/;"	m	struct:node	typeref:struct:node::user	file:

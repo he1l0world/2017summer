@@ -4,33 +4,51 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-BUFSIZE	client_base.h	9;"	d
-CHAT_COM	client_base.h	14;"	d
-CHAT_PRI	client_base.h	15;"	d
-DOWNLOAD_FILE	client_base.h	13;"	d
-INVALID_USERINFO	client_base.c	18;"	d	file:
-SIGN_IN	client_base.h	10;"	d
-SIGN_UP	client_base.h	11;"	d
-UPDATE_FILE	client_base.h	12;"	d
-USER	client_base.h	/^    }USER;$/;"	t	typeref:struct:user
-VALID_USERINFO	client_base.c	19;"	d	file:
-_CLIENT_BASE_H	client_base.h	8;"	d
-buf	client_base.h	/^        char buf[BUFSIZE];$/;"	m	struct:node
+BUFSIZE	my_client.c	25;"	d	file:
+Buf	my_client.c	/^struct node *Buf;$/;"	v	typeref:struct:node
+CHAT_ADD	my_client.c	30;"	d	file:
+CHAT_CREATE	my_client.c	32;"	d	file:
+CHAT_DEL	my_client.c	34;"	d	file:
+CHAT_JOIN	my_client.c	33;"	d	file:
+CHAT_PRI	my_client.c	31;"	d	file:
+DOWNLOAD_FILE	my_client.c	29;"	d	file:
+INVALID_USERINFO	my_client.c	36;"	d	file:
+QUIT	my_client.c	35;"	d	file:
+SIGN_IN	my_client.c	26;"	d	file:
+SIGN_UP	my_client.c	27;"	d	file:
+UPDATE_FILE	my_client.c	28;"	d	file:
+USER	my_client.c	/^}USER;$/;"	t	typeref:struct:user	file:
+VALID_USERINFO	my_client.c	37;"	d	file:
+adr	my_client.c	/^char *adr = "127.0.0.1";$/;"	v
+buf	my_client.c	/^    char buf[BUFSIZE];$/;"	m	struct:node	file:
 cc	Makefile	/^cc=gcc$/;"	m
-input_userinfo	client_base.c	/^int input_userinfo(int conn_fd , const char *string)$/;"	f
+chat_add	my_client.c	/^void chat_add()$/;"	f
+chat_com	my_client.c	/^void chat_com()$/;"	f
+chat_pri	my_client.c	/^void chat_pri()$/;"	f
+check_username	my_client.c	/^int check_username(struct node recv_buf)$/;"	f
+conn_fd	my_client.c	/^int conn_fd ;$/;"	v
+do_something	my_client.c	/^void *do_something(void *arg)$/;"	f
+download_file	my_client.c	/^void download_file()$/;"	f
+filename	my_client.c	/^    char filename[BUFSIZE];$/;"	m	struct:node	file:
+id	my_client.c	/^    int id;$/;"	m	struct:node	file:
 main	my_client.c	/^int main ()$/;"	f
 main_UI	my_client.c	/^void main_UI ()$/;"	f
-my_err	client_base.c	/^void my_err(const char *err_string ,int line)$/;"	f
-my_recv	client_base.c	/^int my_recv(int conn_fd , struct node Buf ,int len)$/;"	f
-node	client_base.h	/^    struct node$/;"	s
-password	client_base.h	/^        char password[32];$/;"	m	struct:user
-path	client_base.h	/^        char path[BUFSIZE];$/;"	m	struct:node
-recv	client_base.h	/^        char recv[BUFSIZE];$/;"	m	struct:node
-send	client_base.h	/^        char send[BUFSIZE];$/;"	m	struct:node
-send_data	client_base.c	/^void send_data(int conn_fd , struct node *buf , int len)$/;"	f
-sign_in	client_base.c	/^void sign_in(int conn_fd ,struct user *userinfo , struct sockaddr_in serv_addr)$/;"	f
-sign_up	client_base.c	/^void sign_up(int conn_fd , struct user *userinfo , struct sockaddr_in serv_addr)$/;"	f
-type	client_base.h	/^        int type;$/;"	m	struct:node
-user	client_base.h	/^    typedef struct user$/;"	s
-username	client_base.h	/^        char username[32];$/;"	m	struct:user
-users	client_base.h	/^        struct user  users;$/;"	m	struct:node	typeref:struct:node::user
+my_err	my_client.c	/^void my_err(const char *err_string ,int line)$/;"	f
+myname	my_client.c	/^    char myname[BUFSIZE];$/;"	m	struct:node	file:
+mysql	my_client.c	/^MYSQL mysql;$/;"	v
+name	my_client.c	/^    char name[BUFSIZE];$/;"	m	struct:node	file:
+node	my_client.c	/^struct node$/;"	s	file:
+password	my_client.c	/^    char password[32];$/;"	m	struct:user	file:
+port	my_client.c	/^char *port = "9999";$/;"	v
+result	my_client.c	/^MYSQL_RES *result;$/;"	v
+row	my_client.c	/^MYSQL_ROW row;$/;"	v
+send	my_client.c	/^    char send[BUFSIZE];$/;"	m	struct:node	file:
+serv_addr	my_client.c	/^struct sockaddr_in serv_addr;$/;"	v	typeref:struct:sockaddr_in
+sign_in	my_client.c	/^void sign_in(int conn_fd ,struct node Buf , struct sockaddr_in serv_addr)$/;"	f
+sign_up	my_client.c	/^void sign_up(int conn_fd , struct node Buf , struct sockaddr_in serv_addr)$/;"	f
+type	my_client.c	/^    int type;$/;"	m	struct:node	file:
+update_file	my_client.c	/^void update_file()$/;"	f
+user	my_client.c	/^typedef struct user$/;"	s	file:
+username	my_client.c	/^    char username[32];$/;"	m	struct:user	file:
+username	my_client.c	/^char username[32];$/;"	v
+users	my_client.c	/^    struct user  users;$/;"	m	struct:node	typeref:struct:node::user	file:
