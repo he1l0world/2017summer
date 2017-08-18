@@ -273,7 +273,10 @@ void *do_something(void *arg)
                 printf("没有此群聊的历史记录\n");
                 break;
             case 1200://成功 
-                printf("群聊 %s 记录 %s\n",recv_buf->mes.group,recv_buf->mes.content);
+                printf("记录 %s\n",recv_buf->mes.content);
+                break;
+            case 1204://不是群成员
+                printf("您不是此群成员,无法查看记录\n");
                 break;
             case 1300://发送文件
                 printf("您有一条发送文件请求，请及时查看 \n");
@@ -450,6 +453,7 @@ void chat_join()
     post_buf = (struct node*)malloc(sizeof(struct node));
     printf("请输入想要加入的群名:      ");
     scanf("%s",post_buf->mes.group);
+    getchar();
     printf("请输入验证消息:        ");
     gets(post_buf->mes.content);
     post_buf->type = 3;
@@ -494,6 +498,7 @@ void chat_add()
     post_buf->type = 6;
     printf("请输入想要添加的好友名:   ");
     scanf("%s",post_buf->mes.to_who);
+    getchar();
     printf("请输入验证消息:         ");
     gets(post_buf->mes.content);
     strcpy(post_buf->mes.from_who,username);
@@ -537,6 +542,7 @@ void chat_pri()
     printf("请输入想要私聊的好友名:   ");
     scanf("%s",post_buf->mes.to_who);
     strcpy(post_buf->mes.from_who,username);
+    getchar();
     printf("---------------开始聊天---------------\n");
     printf("            输入‘#end’表示结束       \n");
     while(1)
@@ -576,6 +582,7 @@ void chat_com()
     printf("请输入想要群聊的名字:  ");
     scanf("%s",post_buf->mes.group);
     strcpy(post_buf->mes.from_who,username);
+    getchar();
     printf("---------------开始聊天------------\n");
     printf("            输入‘#end’表示结束    \n");
     while(1)
@@ -614,6 +621,7 @@ void send_file()
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
     post_buf->type = 13;
+    strcpy(post_buf->mes.from_who,username);
     printf("请输入想要发送的好友:      ");
     scanf("%s",post_buf->mes.to_who);
     filename = readline("请输入文件路径：");
@@ -661,10 +669,8 @@ void show_fri()
         }
         int n = 0;
         char choice;
-        printf("请输入想要处理的信息序号:   ");
+        printf("\n请输入想要处理的信息序号:   ");
         scanf("%d",&cho);
-        getchar();
-        tail = head;
         getchar();
         tail = head;
         struct info* temp;
@@ -672,7 +678,7 @@ void show_fri()
         temp = tail->next;
         while(temp != NULL)
         {
-            if(temp->type = 600)
+            if(temp->type == 600)
             {
                 n++;
                 if(n == cho)
@@ -683,9 +689,9 @@ void show_fri()
                     printf("用户%s想要加你为好友!\n",temp->mes.from_who);
                     printf("验证消息:    ");
                     printf("%s\n",temp->mes.content);
-                    printf("请选择是否同意(y/n)");
+                    printf("\n请选择是否同意(y/n)");
                     choice = getchar();
-                    if(choice = 'y')
+                    if(choice == 'y')
                     {
                         post_buf->type = 603;
                         if(send(conn_fd,post_buf,sizeof(struct node), 0)< 0)
@@ -726,7 +732,7 @@ void show_join()
              }
              tail = tail->next;
          }
-         printf("请输入想要处理的信息序号:   ");
+         printf("\n请输入想要处理的信息序号:   ");
          scanf("%d",&cho);
         getchar();
          join = 0;
@@ -737,7 +743,7 @@ void show_join()
         temp = tail->next;
          while(temp != NULL)
          {
-             if(temp->type = 303)
+             if(temp->type == 303)
              {
                  n++;
                  if(n == cho)
@@ -749,9 +755,9 @@ void show_join()
                      printf("用户%s想要加入群聊  %s!\n",temp->mes.from_who ,temp->mes.group);
                      printf("验证消息:    ");
                      printf("%s\n",temp->mes.content);
-                     printf("是否同意(y/n) :   ");
+                     printf("\n是否同意(y/n) :   ");
                      choice = getchar();
-                     if(choice = 'y')
+                     if(choice == 'y')
                      {
                          post_buf->type = 300;
                          if(send(conn_fd,post_buf,sizeof(struct node), 0)< 0)
@@ -793,7 +799,7 @@ void show_inv()
             }
              tail =tail->next;
         }
-        printf("请输入想要处理的信息序号:   ");
+        printf("\n请输入想要处理的信息序号:   ");
         scanf("%d",&cho);
         getchar();
         inv = 0;
@@ -804,7 +810,7 @@ void show_inv()
         temp = tail->next;
         while(temp != NULL)
         {
-            if(temp->type = 500)
+            if(temp->type == 500)
             {
                 n++;
                 if(n == cho)
@@ -816,9 +822,9 @@ void show_inv()
                     printf("用户%s想邀请你加入群聊 %s!\n",temp->mes.from_who,post_buf->mes.group);
                     printf("验证消息:    ");
                     printf("%s\n",temp->mes.content);
-                    printf("是否同意(y/n):   ");
+                    printf("\n是否同意(y/n):   ");
                     choice = getchar();
-                    if(choice = 'y')
+                    if(choice == 'y')
                     {
                         post_buf->type = 502;
                         if(send(conn_fd,post_buf,sizeof(struct node), 0)< 0)
@@ -860,7 +866,7 @@ void show_file()
              }
              tail = tail->next;
          }
-         printf("请输入想要处理的信息序号:   ");
+         printf("\n请输入想要处理的信息序号:   ");
          scanf("%d",&cho);
         getchar();
          file = 0;
@@ -871,7 +877,7 @@ void show_file()
         temp = tail->next;
         while(temp != NULL)
         {
-            if(temp->type = 1300)
+            if(temp->type == 1300)
             {
                 n++;
                 if(n == cho)
@@ -881,9 +887,9 @@ void show_file()
                     strcpy(post_buf->mes.to_who,temp->mes.to_who);
                     strcpy(post_buf->mes.filename,temp->mes.filename);
                     printf("用户%s想要给你发送文件!\n",temp->mes.from_who);
-                    printf("是否同意?(y/n)");
+                    printf("\n是否同意?(y/n)");
                     choice = getchar();
-                    if(choice = 'y')
+                    if(choice == 'y')
                     {
                         post_buf->type = 1303;
                         if(send(conn_fd,post_buf,sizeof(struct node), 0)< 0)

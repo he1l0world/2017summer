@@ -60,7 +60,7 @@ void send_data(int conn_fd ,struct node Buf );
 void *do_something(void *arg);
 void update_file(int con_fd ,struct node Buf);
 void download_file(int con_fd , struct node Buf);
-void add_his(char *err_string ,int line);
+void add_his(int type , struct node Buf);
 int check_username(struct node Buf);
 void chat_add(int con_fd,struct node Buf);
 void quit();
@@ -84,7 +84,6 @@ int find_fd(char *);
 struct con_fd userinfo[1000];
 int i = 0;
 char *err_his = ".err_history.txt";
-char *ope_his = ".ope_history.txt";
 int num = 0;
 MYSQL mysql;
 int main ()
@@ -214,15 +213,24 @@ void send_message(int con_fd,struct node Buf)
     sprintf(sql," delete from message where to_who='%s';",Buf.users.username);
     mysql_query(&mysql,sql);
 }
-void add_his(char *err_string ,int line)
+void add_his(int type , struct node Buf)
 {
     time_t *timep =(time_t*)malloc(sizeof(time_t));
     time(timep);
     char *s = ctime(timep);
-    sprintf(err_string," ",s,"\0");
     int fd;
-    fd = open(err_his ,O_WRONLY);
-    write(fd , err_string ,sizeof(err_string));
+    //fd = open(err_his ,O_WRONLY);
+    printf("time %s",s);
+    switch(type)
+    {
+        case 000://用户登录成功
+        case 001://用户登录失败
+        case 100://用户注册成功
+        case 102://用户注册失败
+        case 101://用户存在
+        default:
+            break;
+    }
     close(fd);
 }
 
@@ -234,7 +242,6 @@ void my_err(char *err_string ,int line)
 {
     fprintf(stderr , "line %d ",line);
     perror(err_string);
-    add_his(err_string ,line);
 }
 
 int check_account(struct node Buf)
@@ -276,15 +283,19 @@ int check_fri(struct node Buf)
     MYSQL_RES *result;
 
     char sql[128];
-    sprintf(sql,"select * from friends where username='%s' and friend='%s';",Buf.mes.to_who,Buf.mes.from_who,Buf.mes.to_who);
+    sprintf(sql,"select * from friends where username='%s' and friend='%s';",Buf.mes.from_who,Buf.mes.to_who);
+    printf("sql %s",sql);
+    printf("from %s to %s\n",Buf.mes.from_who,Buf.mes.to_who);
     /*连接myqsl查找好友 */
     int res = mysql_query(&mysql,sql);//正确返回0
+    printf("res %d\n",res);
     if(res)
         return 0;
     else
     {
         result = mysql_store_result(&mysql);
         row = mysql_fetch_row(result);
+        printf("friend %s %s\n",row[0],row[1]);
         //printf("row %s\n",row);
         if(row == NULL)
             return 0;
@@ -394,6 +405,7 @@ void sign_in(int con_fd , struct node Buf)
     if(check_account(Buf) == 1)
     {
         post_buf->type = 000; //成功登录
+        add_his(post_buf->type,Buf);
         strcpy(userinfo[i].name,Buf.users.username);
         userinfo[i].stat = 1;
         userinfo[i].conn_fd = con_fd;
@@ -401,11 +413,15 @@ void sign_in(int con_fd , struct node Buf)
         if(send(con_fd,post_buf,sizeof(struct node) , 0) < 0)
             my_err("send",__LINE__);
         send_message(con_fd,Buf);
+        add_his(post_buf->type , Buf);
     }
     else
+    {
         post_buf->type = 001; //帐号或密码错误
-    if(send(con_fd , post_buf , sizeof(struct node ), 0) < 0)
-        my_err("send",__LINE__);
+        add_his(post_buf->type,Buf);
+        if(send(con_fd , post_buf , sizeof(struct node ), 0) < 0)
+            my_err("send",__LINE__);
+    }
 }
 void sign_up(int con_fd , struct node Buf)
 {
@@ -420,7 +436,10 @@ void sign_up(int con_fd , struct node Buf)
         sprintf(sql,"insert into userinfo values('%s' , '%s');",Buf.users.username,Buf.users.password);
         ret = mysql_query(&mysql,sql);
         if(ret)
+        {
             post_buf->type = 102;//注册失败
+            add_his(post_buf->type,Buf);
+        }
         else
         {
             strcpy(userinfo[i].name,Buf.users.username);
@@ -428,13 +447,17 @@ void sign_up(int con_fd , struct node Buf)
             userinfo[i].conn_fd = con_fd;
             i++;
             post_buf->type = 100;//注册成功
+            add_his(100,Buf);
             if(send(con_fd,post_buf,sizeof(struct node), 0) < 0)
                 my_err("send",__LINE__);
             send_message(con_fd,Buf);
         }
     }
     else
+    {
         post_buf->type =101;//帐号存在
+        add_his(101,Buf);
+    }   
     if(send(con_fd,post_buf,sizeof(struct node), 0) <0)
         my_err("send",__LINE__);
 }
@@ -701,6 +724,7 @@ void his_pri(int con_fd , struct node Buf)
     {
         sprintf(sql,"select username,history,chattime from his_pri where username='%s' and friend='%s' union select username ,history,chattime from his_pri where username='%s' and friend='%s' order by chattime;",Buf.mes.from_who,Buf.mes.to_who,Buf.mes.to_who,Buf.mes.from_who);
         ret = mysql_query(&mysql,sql);
+char *ope_his = ".ope_history.txt";
         if(ret)
         {
             post_buf->type = 1002;//执行失败
@@ -796,7 +820,7 @@ void his_com(int con_fd , struct node Buf)
     int fd;
     if(check_group(Buf) == 1)
     {
-        sprintf(sql,"select username,history,chattime from his_com where groupname='%s';",Buf.mes.from_who,Buf.mes.group);
+        sprintf(sql,"select * from chatgroup where groupname='%s' and member='%s';",Buf.mes.group,Buf.mes.from_who);
         ret = mysql_query(&mysql,sql);
         if(ret)
         {
@@ -810,13 +834,22 @@ void his_com(int con_fd , struct node Buf)
             row = mysql_fetch_row(result);
             if(row == NULL)
             {
-                post_buf->type = 1203;//没有历史记录
+                post_buf->type = 1204;//不是群成员
                 if(send(con_fd,post_buf,sizeof(struct node), 0)< 0)
-                my_err("send",__LINE__);
+                    my_err("send",__LINE__);
             }
             else
             {
+                memset(sql,0,sizeof(sql));
+                sprintf(sql,"select username,history,chattime from his_com where groupname='%s';",Buf.mes.group);
+                mysql_query(&mysql,sql);
+                result = mysql_store_result(&mysql);
+                row = mysql_fetch_row(result);
+
+
                 sprintf(content,"%s: %s %s",row[0],row[1],row[2]);
+                printf("content =%s\n",content);
+                printf("-----------------hekzah\n");
                 strcpy(post_buf->mes.content,content);
                 post_buf->type = 1200;
                 send(con_fd,post_buf,sizeof(struct node), 0);
@@ -869,6 +902,7 @@ void send_file(int con_fd , struct node Buf)
         if(fd)
         {
             Buf.type = 1300;//询问是否同意发送文件
+            printf("filename =%s\n",filename);
             strcpy(Buf.mes.filename,filename);
             if(send(fd,&Buf,sizeof(struct node), 0 )< 0)
                 my_err("send",__LINE__);
@@ -883,7 +917,11 @@ void send_file(int con_fd , struct node Buf)
                 close(fd1);
         }
         else
+        {
+            Buf.type = 1300;
             message_box(Buf);
+        
+        }
     }
     else
     {
@@ -1013,8 +1051,9 @@ void *do_something(void* arg)
                 break;
             case 300://群主同意
                 memset(sql,0,sizeof(sql));
-                printf("%s %s %s\n",recv_buf->mes.group,recv_buf->mes.from_who,recv_buf->mes.to_who);
-                sprintf(sql,"insert into chatgroup values('%s','%s','%s');",recv_buf->mes.group,recv_buf->mes.from_who,recv_buf->mes.to_who);
+                owner = check_own(*recv_buf); 
+                sprintf(sql,"insert into chatgroup values('%s','%s','%s');",recv_buf->mes.group,recv_buf->mes.from_who,owner);
+                printf("sql =%s\n",sql);
                 mysql_query(&mysql,sql);
                 recv_buf->type = 300;
                 fd = find_fd(recv_buf->mes.from_who);
@@ -1049,6 +1088,7 @@ void *do_something(void* arg)
                 recv_buf->type = 502;
                 memset(sql,0,sizeof(sql));
                 owner = check_own(*recv_buf);
+                printf("owner %s\n",owner);
                 sprintf(sql,"insert into chatgroup values ('%s','%s','%s');",recv_buf->mes.group,recv_buf->mes.to_who,owner);
                 mysql_query(&mysql,sql);
                 fd = find_fd(recv_buf->mes.from_who);
