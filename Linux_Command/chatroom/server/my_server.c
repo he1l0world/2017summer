@@ -724,7 +724,6 @@ void his_pri(int con_fd , struct node Buf)
     {
         sprintf(sql,"select username,history,chattime from his_pri where username='%s' and friend='%s' union select username ,history,chattime from his_pri where username='%s' and friend='%s' order by chattime;",Buf.mes.from_who,Buf.mes.to_who,Buf.mes.to_who,Buf.mes.from_who);
         ret = mysql_query(&mysql,sql);
-char *ope_his = ".ope_history.txt";
         if(ret)
         {
             post_buf->type = 1002;//执行失败
@@ -739,11 +738,12 @@ char *ope_his = ".ope_history.txt";
             {
                 post_buf->type = 1003;//没有历史记录
                 if(send(con_fd,post_buf,sizeof(struct node), 0)< 0)
-                my_err("send",__LINE__);
+                    my_err("send",__LINE__);
             }
             else
             {
                 sprintf(content,"%s: %s %s",row[0],row[1],row[2]);
+                printf("content =%s\n",content);
                 strcpy(post_buf->mes.content,content);
                 post_buf->type = 1000;
                 send(con_fd,post_buf,sizeof(struct node), 0);
@@ -849,7 +849,6 @@ void his_com(int con_fd , struct node Buf)
 
                 sprintf(content,"%s: %s %s",row[0],row[1],row[2]);
                 printf("content =%s\n",content);
-                printf("-----------------hekzah\n");
                 strcpy(post_buf->mes.content,content);
                 post_buf->type = 1200;
                 send(con_fd,post_buf,sizeof(struct node), 0);

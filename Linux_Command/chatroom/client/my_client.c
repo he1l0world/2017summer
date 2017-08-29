@@ -360,7 +360,7 @@ void sign_in(int conn_fd , struct node Buf)
         memset(name,0,sizeof(name));
         memset(post_buf , 0 ,sizeof(struct node));
         post_buf->type = 0;
-        printf("请输入用户名:           ");
+        printf("请输入用户名:_____\b\b\b\b\b");
         scanf("%s",name);
         strcpy(post_buf->users.username,name);
         printf("请输入密码:             ");
@@ -403,7 +403,7 @@ void sign_up(int conn_fd ,struct node Buf)
     {
         memset(name,0,sizeof(name));
         memset(post_buf , 0 ,sizeof(struct node));
-        printf("请输入帐号:        ");
+        printf("请输入帐号:_____\b\b\b\b\b");
         scanf("%s",name);
         strcpy(post_buf->users.username,name);
         printf("请输入密码:        ");
@@ -438,7 +438,7 @@ void chat_create()
     fflush(stdin);
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
-    printf("请输入群名:       ");
+    printf("请输入群名:____\b\b\b\b");
     scanf("%s",post_buf->mes.group);
     post_buf->type = 2;
     strcpy(post_buf->mes.from_who,username);
@@ -451,7 +451,7 @@ void chat_join()
     fflush(stdin);
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
-    printf("请输入想要加入的群名:      ");
+    printf("请输入想要加入的群名:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.group);
     getchar();
     printf("请输入验证消息:        ");
@@ -467,7 +467,7 @@ void chat_can()
     fflush(stdin);
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
-    printf("请输入想要解散的群名:     ");
+    printf("请输入想要解散的群名:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.group);
     strcpy(post_buf->mes.from_who,username);
     post_buf->type = 4;
@@ -481,10 +481,10 @@ void chat_inv()
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
     post_buf->type = 5;
-    printf("想要邀请的好友名字:");
+    printf("想要邀请的好友名字:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.to_who);
     strcpy(post_buf->mes.from_who,username);
-    printf("想要让好友加入的群聊名字:");
+    printf("想要让好友加入的群聊名字:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.group);
     if(send(conn_fd , post_buf ,sizeof(struct node), 0)< 0 )
         my_err("send",__LINE__);
@@ -496,7 +496,7 @@ void chat_add()
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
     post_buf->type = 6;
-    printf("请输入想要添加的好友名:   ");
+    printf("请输入想要添加的好友名:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.to_who);
     getchar();
     printf("请输入验证消息:         ");
@@ -513,7 +513,7 @@ void chat_del()
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
     post_buf->type = 7;
-    printf("请输入想要删除的好友名:        ");
+    printf("请输入想要删除的好友名:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.to_who);
     strcpy(post_buf->mes.from_who,username);
     if(send(conn_fd , post_buf ,sizeof(struct node), 0 )< 0)
@@ -539,7 +539,7 @@ void chat_pri()
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
     post_buf->type = 9;
-    printf("请输入想要私聊的好友名:   ");
+    printf("请输入想要私聊的好友名:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.to_who);
     strcpy(post_buf->mes.from_who,username);
     getchar();
@@ -564,7 +564,7 @@ void his_pri()
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
     post_buf->type = 10;
-    printf("请输入想要查看的好友记录:     ");
+    printf("请输入想要查看的好友记录:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.to_who);
     strcpy(post_buf->mes.from_who,username);
     if(send(conn_fd  , post_buf ,sizeof(struct node), 0) < 0)
@@ -579,7 +579,7 @@ void chat_com()
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
     post_buf->type = 11;
-    printf("请输入想要群聊的名字:  ");
+    printf("请输入想要群聊的名字:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.group);
     strcpy(post_buf->mes.from_who,username);
     getchar();
@@ -604,7 +604,7 @@ void his_com()
     struct node *post_buf;
     post_buf = (struct node*)malloc(sizeof(struct node));
     post_buf->type =12 ;
-    printf("请输入想要看记录的群名:      ");
+    printf("请输入想要看记录的群名:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.group);
     strcpy(post_buf->mes.from_who,username);
     if(send(conn_fd , post_buf,sizeof(struct node) , 0)< 0)
@@ -622,7 +622,7 @@ void send_file()
     post_buf = (struct node*)malloc(sizeof(struct node));
     post_buf->type = 13;
     strcpy(post_buf->mes.from_who,username);
-    printf("请输入想要发送的好友:      ");
+    printf("请输入想要发送的好友:_____\b\b\b\b\b");
     scanf("%s",post_buf->mes.to_who);
     filename = readline("请输入文件路径：");
     len = strlen(filename);
@@ -669,7 +669,7 @@ void show_fri()
         }
         int n = 0;
         char choice;
-        printf("\n请输入想要处理的信息序号:   ");
+        printf("\n请输入想要处理的信息序号:_____\b\b\b\b\b");
         scanf("%d",&cho);
         getchar();
         tail = head;
@@ -732,7 +732,7 @@ void show_join()
              }
              tail = tail->next;
          }
-         printf("\n请输入想要处理的信息序号:   ");
+         printf("\n请输入想要处理的信息序号:_____\b\b\b\b\b");
          scanf("%d",&cho);
         getchar();
          join = 0;
@@ -799,7 +799,7 @@ void show_inv()
             }
              tail =tail->next;
         }
-        printf("\n请输入想要处理的信息序号:   ");
+        printf("\n请输入想要处理的信息序号:_____\b\b\b\b\b");
         scanf("%d",&cho);
         getchar();
         inv = 0;
@@ -866,7 +866,7 @@ void show_file()
              }
              tail = tail->next;
          }
-         printf("\n请输入想要处理的信息序号:   ");
+         printf("\n请输入想要处理的信息序号:_____\b\b\b\b\b");
          scanf("%d",&cho);
         getchar();
          file = 0;
@@ -932,7 +932,7 @@ void check_info()
             printf("------     4文件请求(%d)---------\n",file);
             printf("------     5退出        ---------\n");
             printf("---------------------------------\n");
-            printf("请输入你的选择:     ");
+            printf("请输入你的选择:_____\b\b\b\b\b");
             scanf("%d",&ch);
         }while(ch < 1 || ch > 5);
         switch (ch)
@@ -1003,7 +1003,7 @@ void main_UI ()
             printf("            15:查看群成员\n");
             printf("            16:退出\n");
             printf("-------------------------------------------\n");
-            printf("请输入你的选择:   ");
+            printf("请输入你的选择:_____\b\b\b\b\b");
             scanf("%d",&ch);
         }while(ch < 2 || ch > 16);
     int type;
