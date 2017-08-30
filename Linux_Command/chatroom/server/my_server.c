@@ -90,7 +90,7 @@ int main ()
 { 
     signal(SIGPIPE,SIG_IGN);
     mysql_init(&mysql);//初始化mysql
-    if(!mysql_real_connect(&mysql,"47.93.198.31","root","Mr.chen583627195","chatroom",3306,NULL,0))
+    if(!mysql_real_connect(&mysql,"(mysql地址)","root","Mr.chen583627195","chatroom",3306,NULL,0))
     {
         mysql_close(&mysql);
         my_err("mysql",__LINE__);
